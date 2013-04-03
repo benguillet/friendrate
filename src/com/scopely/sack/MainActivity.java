@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -14,10 +16,12 @@ import com.facebook.UiLifecycleHelper;
 public class MainActivity extends FragmentActivity {
 	private static final int SPLASH         = 0;
 	private static final int SELECTION      = 1;
-	private static final int FRAGMENT_COUNT = SELECTION +1;
+	private static final int SETTINGS 		= 2;
+	private static final int FRAGMENT_COUNT = SETTINGS +1;
 	
 	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
 	private boolean isResumed = false;
+	private MenuItem settings;
 	
 	private UiLifecycleHelper uiHelper;
 	private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -38,6 +42,7 @@ public class MainActivity extends FragmentActivity {
 	    FragmentManager fm   = getSupportFragmentManager();
 	    fragments[SPLASH]    = fm.findFragmentById(R.id.splashFragment);
 	    fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
+	    fragments[SETTINGS]  = fm.findFragmentById(R.id.userSettingsFragment);
 
 	    FragmentTransaction transaction = fm.beginTransaction();
 	    for(int i = 0; i < fragments.length; ++i) {
@@ -131,11 +136,28 @@ public class MainActivity extends FragmentActivity {
 	    }
 	    transaction.commit();
 	}
-
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.main, menu);
-//		return true;
-//	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+	    // only add the menu when the selection fragment is showing
+	    if (fragments[SELECTION].isVisible()) {
+	        if (menu.size() == 0) {
+	            settings = menu.add(R.string.settings);
+	        }
+	        return true;
+	    } else {
+	        menu.clear();
+	        settings = null;
+	    }
+	    return false;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    if (item.equals(settings)) {
+	        showFragment(SETTINGS, true);
+	        return true;
+	    }
+	    return false;
+	}
 }
