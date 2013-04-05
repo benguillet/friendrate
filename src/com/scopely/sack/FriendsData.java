@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class FriendsData extends SQLiteOpenHelper implements Constants {
 	private final static String DATABASE_NAME = "sack.db";
-	private final static int DATABASE_VERSION = 2;
+	private final static int DATABASE_VERSION = 4;
 	
 	public FriendsData(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -17,7 +17,7 @@ public class FriendsData extends SQLiteOpenHelper implements Constants {
 		String createFriendTable = "CREATE TABLE " + TABLE_NAME + " (" + _ID +
 				" INTEGER PRIMARY KEY AUTOINCREMENT, " + FACEBOOK_ID + 
 				" INTEGER NOT NULL, " + FIRST_NAME + " TEXT NOT NULL, " + LAST_NAME + 
-				" TEXT NOT NULL, " + SCORE + " INTEGER DEFAULT NULL, " + CREATED_AT +
+				" TEXT NOT NULL, " + SCORE + " INTEGER DEFAULT \'0\', " + CREATED_AT +
 				" INTEGER NOT NULL, " + UPDATED_AT + " INTEGER NOT NULL, " + 
 				"UNIQUE(" + FACEBOOK_ID + ") ON CONFLICT IGNORE);";
 		db.execSQL(createFriendTable);
