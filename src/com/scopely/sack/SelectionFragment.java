@@ -39,7 +39,10 @@ public class SelectionFragment extends Fragment implements Constants {
 	
 	private FriendsData friends;
 	private int[] randomFriends;
+	private int[] lastRandomFriends;
 	private ArrayList<Integer> tabuListFriendsId;
+	private long[] friendsFacebookID;
+	private String[] friendsName;
 	private int friendCount;
 	
 	private UiLifecycleHelper uiHelper;
@@ -58,7 +61,19 @@ public class SelectionFragment extends Fragment implements Constants {
 	    friends = new FriendsData(getActivity());
 	    tabuListFriendsId = new ArrayList<Integer>();
 	    randomFriends = new int[2];
+	    lastRandomFriends = new int[2];
+	    friendsFacebookID = new long[2];
+		friendsName     = new String[2];
 	    friendCount = 0;
+	    // Check for an open session
+	    Session session = Session.getActiveSession();
+	    if (session != null && session.isOpened()) {
+	        // Get the user's friends
+	        makeFriendsRequest(session);
+	    }
+	    Log.d(TAG, "onCreate");
+	    randomFriends = pickTwoRandomFriends();
+	    setRetainInstance(true);
 	}
 	
 	@Override
@@ -104,16 +119,8 @@ public class SelectionFragment extends Fragment implements Constants {
 	    
 	    userNameFriend1 = (TextView) view.findViewById(R.id.user_name_friend_1);
 	    userNameFriend2 = (TextView) view.findViewById(R.id.user_name_friend_2);
-	   
-	    
-	    // Check for an open session
-	    Session session = Session.getActiveSession();
-	    if (session != null && session.isOpened()) {
-	        // Get the user's friends
-	        makeFriendsRequest(session);
-	    }
-        
-	    pickTwoRandomFriends();
+	    	    
+	    displayFriends(randomFriends[0], randomFriends[1]);
 	    return view;
 	}
 	
@@ -180,7 +187,7 @@ public class SelectionFragment extends Fragment implements Constants {
 		db.insertOrThrow(TABLE_NAME, null, values);
 	}
 	
-	private void pickTwoRandomFriends() {
+	private int[] pickTwoRandomFriends() {
 		if (friendCount == 0) {
 			SQLiteDatabase db = friends.getReadableDatabase();
 			Cursor fCount = db.rawQuery("SELECT COUNT(*) FROM "+ TABLE_NAME +";", null);
@@ -190,6 +197,7 @@ public class SelectionFragment extends Fragment implements Constants {
 		}
 		
 		Random randomGenerator = new Random();
+		int[] randomFriends = new int[2];
 		int counter = 0;
 		while(counter < 2) {
 			Integer randomFriend = Integer.valueOf(randomGenerator.nextInt(friendCount));
@@ -200,33 +208,34 @@ public class SelectionFragment extends Fragment implements Constants {
 		//Log.d(TAG, "friendCount: " + friendCount);
 		//Log.d(TAG, "friend1: " + randomFriends[0]);
 		//Log.d(TAG, "friend2: " + randomFriends[1]);
-		
-		displayFriends(randomFriends[0], randomFriends[1]);
+		return randomFriends;
 	}
 
 	private void displayFriends(int friend1, int friend2) {
-		// TODO: prevent recall when screen orientation has changed:
-		// http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
-		SQLiteDatabase db = friends.getReadableDatabase();
-		
-		String[] FRIEND = {FACEBOOK_ID, FIRST_NAME, LAST_NAME};
-		String WHERE    =  _ID + " = " + friend1 + " OR " + _ID + " = " + friend2;
-		Cursor cursor = db.query(TABLE_NAME, FRIEND, WHERE, null, null, null, null);
-		
-		long[] friendsFacebookID = new long[2];
-		String[] friendsName     = new String[2];
-		int i = 0;
-		while (cursor.moveToNext()) {
-			friendsFacebookID[i] = cursor.getLong(0);
-			friendsName[i] = cursor.getString(1) + " " + cursor.getString(2);
-			++i;
+		// Make the query only if new info friends requested
+		if (lastRandomFriends[0] != friend1 || lastRandomFriends[1] != friend2) {
+			SQLiteDatabase db = friends.getReadableDatabase();
+			
+			String[] FRIEND = {FACEBOOK_ID, FIRST_NAME, LAST_NAME};
+			String WHERE    =  _ID + " = " + friend1 + " OR " + _ID + " = " + friend2;
+			Cursor cursor = db.query(TABLE_NAME, FRIEND, WHERE, null, null, null, null);
+			
+			int i = 0;
+			while (cursor.moveToNext()) {
+				friendsFacebookID[i] = cursor.getLong(0);
+				friendsName[i] = cursor.getString(1) + " " + cursor.getString(2);
+				++i;
+			}
+			cursor.close();
+			lastRandomFriends[0] = friend1;
+			lastRandomFriends[0] = friend2;
 		}
-		cursor.close();
 		
-		for (int j = 0; j < 2; ++j) {
-			Log.d(TAG, "id" + j + ": " + friendsFacebookID[j]);
-			Log.d(TAG, "name" + j + ": " + friendsName[j]);
-		}
+		// TODO: Clean Debug
+		//for (int j = 0; j < 2; ++j) {
+		//	Log.d(TAG, "id" + j + ": " + friendsFacebookID[j]);
+		//	Log.d(TAG, "name" + j + ": " + friendsName[j]);
+		//}
 		
 		profilePictureFriend1.setProfileId(Long.toString(friendsFacebookID[0]));
 		profilePictureFriend2.setProfileId(Long.toString(friendsFacebookID[1]));
