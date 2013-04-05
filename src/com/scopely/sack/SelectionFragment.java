@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,7 +32,6 @@ import com.facebook.widget.ProfilePictureView;
 
 public class SelectionFragment extends Fragment implements Constants {
 	private static final int REAUTH_ACTIVITY_CODE = 100;
-	private static final String TAG = "com.scopely.sack";
 	
 	private ProfilePictureView[] profilePictureFriends;
 	private TextView userNameFriends[];
@@ -40,11 +40,12 @@ public class SelectionFragment extends Fragment implements Constants {
 	private FriendsData friends;
 	private int[] randomFriends;
 	private int[] lastRandomFriends;
-	private ArrayList<Integer> tabuListFriendsId;
+	private ArrayList<Integer> alreadySelectedFriendsId;
 	private long[] friendsFacebookID;
 	private String[] friendsName;
 	private int friendCount;
 	private int friendsSelected;
+	private boolean firstTime;
 	
 	private UiLifecycleHelper uiHelper;
 	private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -60,7 +61,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	    uiHelper = new UiLifecycleHelper(getActivity(), callback);
 	    uiHelper.onCreate(savedInstanceState);
 	    friends = new FriendsData(getActivity());
-	    tabuListFriendsId = new ArrayList<Integer>();
+	    alreadySelectedFriendsId = new ArrayList<Integer>();
 	    randomFriends = new int[2];
 	    profilePictureFriends = new ProfilePictureView[2];
 	    userNameFriends = new TextView[2];
@@ -69,12 +70,7 @@ public class SelectionFragment extends Fragment implements Constants {
 		friendsName     = new String[2];
 	    friendCount = 0;
 	    friendsSelected = 0;
-	    // Check for an open session
-	    Session session = Session.getActiveSession();
-	    if (session != null && session.isOpened()) {
-	        // Get the user's friends
-	        makeFriendsRequest(session);
-	    }
+	    firstTime = true;
 	    Log.d(TAG, "onCreate");
 	    setRetainInstance(true);
 	    // TODO: if keep being launch, show a loading during the makeFriendsRequest! ie. Updating list of friends...
@@ -116,6 +112,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	    super.onCreateView(inflater, container, savedInstanceState);
 	    View view = inflater.inflate(R.layout.selection, container, false);
 	    
+	    
 	    profilePictureFriends[0] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_1);
 	    profilePictureFriends[1] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_2);
 	    profilePictureFriends[0].setCropped(true);
@@ -138,6 +135,14 @@ public class SelectionFragment extends Fragment implements Constants {
 	    
 	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
 	    
+	    // Check for an open session
+	    Session session = Session.getActiveSession();
+	    if (firstTime) {
+		    if (session != null && session.isOpened()) {
+		        // Get the user's friends
+		        makeFriendsRequest(session);
+		    }
+	    }
 	    displayFriends(randomFriends[0], randomFriends[1]);
 	    
 	    return view;
@@ -175,6 +180,7 @@ public class SelectionFragment extends Fragment implements Constants {
                             	}
                             	randomFriends = pickTwoRandomFriends();
                         	    displayFriends(randomFriends[0], randomFriends[1]);
+                		    	firstTime = false;
                         	    loadingCircle.setVisibility(View.GONE);
                             }
                             catch (JSONException e) {
@@ -186,7 +192,6 @@ public class SelectionFragment extends Fragment implements Constants {
                         }
                     }
                 	finally {
-                		
                 		friends.close();
                 	}
                 }                  
@@ -227,7 +232,7 @@ public class SelectionFragment extends Fragment implements Constants {
 		int counter = 0;
 		while(counter < 2) {
 			Integer randomFriend = Integer.valueOf(randomGenerator.nextInt(friendCount));
-			if (!tabuListFriendsId.contains(randomFriend)) {
+			if (!alreadySelectedFriendsId.contains(randomFriend)) {
 				randomFriends[counter++] = randomFriend;	
 			}
 		}
@@ -278,8 +283,8 @@ public class SelectionFragment extends Fragment implements Constants {
 		// TODO: unit test to check if score incremented
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + SCORE + " = " + SCORE + " + 1 " + "WHERE " + _ID + " = " + idFriend + ";");
 		// TODO: unit test to check if friendSelected incremented
-		// TODO: use tabuListFriend.length to check if more thant 10? No more need of friendsSelected
-		tabuListFriendsId.add(Integer.valueOf(idFriend));
+		// TODO: use tabuListFriend.length to check if more than 10? No more need of friendsSelected
+		alreadySelectedFriendsId.add(Integer.valueOf(idFriend));
 		++friendsSelected;
 		Log.d(TAG, "friendsSelected: " + friendsSelected);
 		
@@ -296,6 +301,11 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private void showFriendsRank() {
-		Log.d(TAG, "hey i'm showing the rank!");
+		// TODO: or callback to activity: http://developer.android.com/guide/components/fragments.html#EventCallbacks
+		// TODO: Activity should take care of launching rank fragment because otherwise selection is reshown after rotation...
+		Activity mainActivity = getActivity();
+		if (mainActivity instanceof MainActivity) {
+		    ((MainActivity) mainActivity).showFragment(RANK, false);
+		}
 	}
 }
