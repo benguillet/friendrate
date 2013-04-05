@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.facebook.HttpMethod;
@@ -34,6 +35,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	
 	private ProfilePictureView[] profilePictureFriends;
 	private TextView userNameFriends[];
+	private ProgressBar loadingCircle;
 	
 	private FriendsData friends;
 	private int[] randomFriends;
@@ -75,6 +77,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	    }
 	    Log.d(TAG, "onCreate");
 	    setRetainInstance(true);
+	    // TODO: if keep being launch, show a loading during the makeFriendsRequest! ie. Updating list of friends...
 	}
 	
 	@Override
@@ -118,19 +121,22 @@ public class SelectionFragment extends Fragment implements Constants {
 	    profilePictureFriends[0].setCropped(true);
 	    profilePictureFriends[1].setCropped(true);
 	    
+	    
 	    for (int i = 0; i < profilePictureFriends.length; ++i) {
     		final int f = i;
 	    	profilePictureFriends[i].setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					incrementScore(f);
-					
+					showNextFriends();
 				}
 			});
 	    }
 	    
 	    userNameFriends[0] = (TextView) view.findViewById(R.id.user_name_friend_1);
 	    userNameFriends[1] = (TextView) view.findViewById(R.id.user_name_friend_2);
+	    
+	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
 	    
 	    displayFriends(randomFriends[0], randomFriends[1]);
 	    
@@ -139,6 +145,8 @@ public class SelectionFragment extends Fragment implements Constants {
 	
 	// TODO: move everything below to another class?
 	private void makeFriendsRequest(final Session session) {
+		// TODO: STOP BLOCKING UI THREAD!! Probably need to do the add friend and request into another thread!!!
+		loadingCircle.setVisibility(View.VISIBLE);
 		String friendsListQuery = "SELECT uid, first_name, last_name FROM user WHERE uid IN " +
 	              	"(SELECT uid2 FROM friend WHERE uid1 = me() LIMIT 1000)";
         Bundle params = new Bundle();
@@ -165,6 +173,9 @@ public class SelectionFragment extends Fragment implements Constants {
                             		String lastName  = friend.get("last_name").toString();
                             		addFriend(uid, firstName, lastName);	
                             	}
+                            	randomFriends = pickTwoRandomFriends();
+                        	    displayFriends(randomFriends[0], randomFriends[1]);
+                        	    loadingCircle.setVisibility(View.GONE);
                             }
                             catch (JSONException e) {
                             	e.printStackTrace();
@@ -175,8 +186,7 @@ public class SelectionFragment extends Fragment implements Constants {
                         }
                     }
                 	finally {
-                		randomFriends = pickTwoRandomFriends();
-                	    displayFriends(randomFriends[0], randomFriends[1]);
+                		
                 		friends.close();
                 	}
                 }                  
@@ -273,5 +283,19 @@ public class SelectionFragment extends Fragment implements Constants {
 		++friendsSelected;
 		Log.d(TAG, "friendsSelected: " + friendsSelected);
 		
+	}
+	
+	private void showNextFriends() {
+		if (friendsSelected < 10) {
+			randomFriends = pickTwoRandomFriends();
+			displayFriends(randomFriends[0], randomFriends[1]);
+		}
+		else {
+			showFriendsRank();
+		}
+	}
+	
+	private void showFriendsRank() {
+		Log.d(TAG, "hey i'm showing the rank!");
 	}
 }
