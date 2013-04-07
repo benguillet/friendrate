@@ -1,13 +1,18 @@
 package com.scopely.sack;
 
+import static com.scopely.sack.Constants.TAG;
+
 import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.MenuItem;
 
 public class RanksActivity extends FragmentActivity implements Constants {
 	
@@ -68,10 +73,17 @@ public class RanksActivity extends FragmentActivity implements Constants {
 	    // Notice that setContentView() is not used, because we use the root
 	    // android.R.id.content as the container for each fragment
 	    
+	    Intent intent = getIntent();
+		alreadySelectedFriendsId = intent.getIntegerArrayListExtra("alreadySelectedFriendsId");
+		for (int i = 0; i < alreadySelectedFriendsId.size(); ++i) {
+		    Log.d(TAG, "friend:"  + alreadySelectedFriendsId.get(i));
+		}
+	    
 	    // setup action bar for tabs
 	    ActionBar actionBar = getActionBar();
 	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	    actionBar.setDisplayShowTitleEnabled(false);
+	    actionBar.setDisplayHomeAsUpEnabled(true);
 
 	    Tab tab = actionBar.newTab()
 	            .setText(R.string.selection_rank)
@@ -85,16 +97,18 @@ public class RanksActivity extends FragmentActivity implements Constants {
 	                this, "General Rank", GeneralRankFragment.class));
 	    actionBar.addTab(tab);
 	}
-
-//	@Override
-//	protected void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		setContentView(R.layout.activity_ranks);
-//		Intent intent = getIntent();
-//		alreadySelectedFriendsId = intent.getIntegerArrayListExtra("alreadySelectedFriendsId");
-//		for (int i = 0; i < alreadySelectedFriendsId.size(); ++i) {
-//		    Log.d(TAG, "friend:"  + alreadySelectedFriendsId.get(i));
-//		}
-//	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	            // This is called when the Home (Up) button is pressed
+	            // in the Action Bar.
+	            Intent parentActivityIntent = new Intent(this, MainActivity.class);
+	            parentActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	            startActivity(parentActivityIntent);
+	            return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
 }
