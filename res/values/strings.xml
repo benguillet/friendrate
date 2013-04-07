@@ -7,6 +7,6 @@
     <string name="settings">Settings</string>
     <string name="title_activity_ranks">RanksActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="selection_rank">Selection Rank</string>
+    <string name="general_rank">General Rank</string>
 </resources>

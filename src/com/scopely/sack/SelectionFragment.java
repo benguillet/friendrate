@@ -49,9 +49,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	private int friendCount;
 	private int friendsSelected;
 	private boolean firstTime;
-	
-	OnSelectionFinishedListener sListener;
-	
+		
 	private UiLifecycleHelper uiHelper;
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 	    @Override
@@ -60,12 +58,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	    }
 	};
 	
-	public interface OnSelectionFinishedListener {
-		  public void onSelectionFinished(ArrayList<Integer> alreadySelectedFriendsId);
-	}
-	
 	private class SimpleGestureFilter extends SimpleOnGestureListener {
-		
 		public SimpleGestureFilter() {
 			super();
 		}
@@ -367,7 +360,6 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private void showFriendsRank() {
-		//sListener.onSelectionFinished(alreadySelectedFriendsId);
 		Intent myIntent = new Intent(getActivity(), RanksActivity.class);
 		myIntent.putIntegerArrayListExtra("alreadySelectedFriendsId", alreadySelectedFriendsId);
 		getActivity().startActivity(myIntent);
