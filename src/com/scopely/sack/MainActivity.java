@@ -33,12 +33,11 @@ public class MainActivity extends FragmentActivity implements Constants {
 	    
 	    uiHelper = new UiLifecycleHelper(this, callback);
 	    uiHelper.onCreate(savedInstanceState);
-
-	    FragmentManager fm   = getSupportFragmentManager();
+	    	    
+	    FragmentManager fm = getSupportFragmentManager();
 	    fragments[SPLASH]    = fm.findFragmentById(R.id.splashFragment);
 	    fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
 	    fragments[SETTINGS]  = fm.findFragmentById(R.id.userSettingsFragment);
-	    fragments[RANK]  	 = fm.findFragmentById(R.id.rankFragment);
 	    
 	    FragmentTransaction transaction = fm.beginTransaction();
 	    for(int i = 0; i < fragments.length; ++i) {

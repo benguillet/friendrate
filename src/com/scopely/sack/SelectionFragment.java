@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,11 +14,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.HttpMethod;
 import com.facebook.Request;
@@ -47,6 +50,8 @@ public class SelectionFragment extends Fragment implements Constants {
 	private int friendsSelected;
 	private boolean firstTime;
 	
+	OnSelectionFinishedListener sListener;
+	
 	private UiLifecycleHelper uiHelper;
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 	    @Override
@@ -54,6 +59,50 @@ public class SelectionFragment extends Fragment implements Constants {
 	        onSessionStateChange(session, state, exception);
 	    }
 	};
+	
+	public interface OnSelectionFinishedListener {
+		  public void onSelectionFinished(ArrayList<Integer> alreadySelectedFriendsId);
+	}
+	
+	private class SimpleGestureFilter extends SimpleOnGestureListener {
+		
+		public SimpleGestureFilter() {
+			super();
+		}
+		
+		@Override
+	    public boolean onDown(MotionEvent e) {
+	        return true;
+	    }
+
+	    @Override
+	    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+	        float velocityY) {
+	        //Log.d(TAG, "onFling has been called!");
+	        final int SWIPE_MIN_DISTANCE = 120;
+	        final int SWIPE_MAX_OFF_PATH = 250;
+	        final int SWIPE_THRESHOLD_VELOCITY = 200;
+	        try {
+	            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+	                return false;
+	            if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	           	 	showNextFriends();
+	                //Log.d(TAG, "Right to Left");
+	            }
+	            else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	                //Log.d(TAG, "Left to Right");
+	            }
+	        }
+	        catch (Exception e) {
+	            // nothing
+	        }
+	        return super.onFling(e1, e2, velocityX, velocityY);
+	    }
+
+	}
+
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -112,6 +161,14 @@ public class SelectionFragment extends Fragment implements Constants {
 	    super.onCreateView(inflater, container, savedInstanceState);
 	    View view = inflater.inflate(R.layout.selection, container, false);
 	    
+	    final GestureDetector gesture = new GestureDetector(getActivity(), new SimpleGestureFilter());
+
+	    view.setOnTouchListener(new View.OnTouchListener() {
+	        @Override
+	        public boolean onTouch(View v, MotionEvent event) {
+	            return gesture.onTouchEvent(event);
+	        }
+	    });
 	    
 	    profilePictureFriends[0] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_1);
 	    profilePictureFriends[1] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_2);
@@ -135,6 +192,8 @@ public class SelectionFragment extends Fragment implements Constants {
 	    
 	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
 	    
+	    
+	    
 	    // Check for an open session
 	    Session session = Session.getActiveSession();
 	    if (firstTime) {
@@ -147,10 +206,12 @@ public class SelectionFragment extends Fragment implements Constants {
 	    
 	    return view;
 	}
-	
+
+
 	// TODO: move everything below to another class?
 	private void makeFriendsRequest(final Session session) {
 		// TODO: STOP BLOCKING UI THREAD!! Probably need to do the add friend and request into another thread!!!
+		Toast.makeText(getActivity(), "Fetching Facebook friends.", Toast.LENGTH_LONG).show();
 		loadingCircle.setVisibility(View.VISIBLE);
 		String friendsListQuery = "SELECT uid, first_name, last_name FROM user WHERE uid IN " +
 	              	"(SELECT uid2 FROM friend WHERE uid1 = me() LIMIT 1000)";
@@ -260,7 +321,7 @@ public class SelectionFragment extends Fragment implements Constants {
 			}
 			cursor.close();
 			lastRandomFriends[0] = friend1;
-			lastRandomFriends[0] = friend2;
+			lastRandomFriends[1] = friend2;
 		}
 		
 		// TODO: Clean Debug
@@ -278,15 +339,20 @@ public class SelectionFragment extends Fragment implements Constants {
 	
 	private void incrementScore(int friend) {
 		int idFriend = randomFriends[friend];
-		Log.d(TAG, "id friend: " + idFriend);
+		Log.d(TAG, "id friend touched: " + idFriend);
 		SQLiteDatabase db = friends.getWritableDatabase();
+		Cursor cursor = db.rawQuery("SELECT first_name, last_name FROM friends WHERE _id = " + idFriend + ";", null);
+		cursor.moveToNext();
+		Log.d(TAG, "friend touched: " + idFriend + " - " + cursor.getString(0) + " " + cursor.getString(1));
+		cursor.close();
 		// TODO: unit test to check if score incremented
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + SCORE + " = " + SCORE + " + 1 " + "WHERE " + _ID + " = " + idFriend + ";");
 		// TODO: unit test to check if friendSelected incremented
 		// TODO: use tabuListFriend.length to check if more than 10? No more need of friendsSelected
 		alreadySelectedFriendsId.add(Integer.valueOf(idFriend));
 		++friendsSelected;
-		Log.d(TAG, "friendsSelected: " + friendsSelected);
+		// TODO: clean debug
+		//Log.d(TAG, "friendsSelected: " + friendsSelected);
 		
 	}
 	
@@ -301,11 +367,11 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private void showFriendsRank() {
-		// TODO: or callback to activity: http://developer.android.com/guide/components/fragments.html#EventCallbacks
-		// TODO: Activity should take care of launching rank fragment because otherwise selection is reshown after rotation...
-		Activity mainActivity = getActivity();
-		if (mainActivity instanceof MainActivity) {
-		    ((MainActivity) mainActivity).showFragment(RANK, false);
-		}
+		//sListener.onSelectionFinished(alreadySelectedFriendsId);
+		Intent myIntent = new Intent(getActivity(), RanksActivity.class);
+		myIntent.putIntegerArrayListExtra("alreadySelectedFriendsId", alreadySelectedFriendsId);
+		getActivity().startActivity(myIntent);
 	}
+	
+	
 }

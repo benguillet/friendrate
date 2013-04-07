@@ -8,8 +8,7 @@ public interface Constants extends BaseColumns {
 	public static final int SPLASH         = 0;
 	public static final int SELECTION      = 1;
 	public static final int SETTINGS 	   = 2;
-	public static final int RANK 		   = 3;
-	public static final int FRAGMENT_COUNT = RANK + 1;
+	public static final int FRAGMENT_COUNT = SETTINGS + 1;
 
 	public static final String TABLE_NAME  = "friends";
 	
