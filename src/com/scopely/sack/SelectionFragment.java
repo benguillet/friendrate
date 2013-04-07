@@ -8,8 +8,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -48,7 +51,8 @@ public class SelectionFragment extends Fragment implements Constants {
 	private String[] friendsName;
 	private int friendCount;
 	private int friendsSelected;
-	private boolean firstTime;
+	private int launchCounter;
+	private boolean firstFragmentApparition;
 		
 	private UiLifecycleHelper uiHelper;
 	private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -71,7 +75,7 @@ public class SelectionFragment extends Fragment implements Constants {
 	    @Override
 	    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 	        float velocityY) {
-	        //Log.d(TAG, "onFling has been called!");
+	        //Log.i(TAG, "onFling has been called!");
 	        final int SWIPE_MIN_DISTANCE = 120;
 	        final int SWIPE_MAX_OFF_PATH = 250;
 	        final int SWIPE_THRESHOLD_VELOCITY = 200;
@@ -81,11 +85,11 @@ public class SelectionFragment extends Fragment implements Constants {
 	            if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
 	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 	           	 	showNextFriends();
-	                //Log.d(TAG, "Right to Left");
+	                //Log.i(TAG, "Right to Left");
 	            }
 	            else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
 	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	                //Log.d(TAG, "Left to Right");
+	                //Log.i(TAG, "Left to Right");
 	            }
 	        }
 	        catch (Exception e) {
@@ -112,10 +116,74 @@ public class SelectionFragment extends Fragment implements Constants {
 		friendsName     = new String[2];
 	    friendCount = 0;
 	    friendsSelected = 0;
-	    firstTime = true;
-	    Log.d(TAG, "onCreate");
+	    firstFragmentApparition = true; 
+	    
+	    SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_launch_counter),Context.MODE_PRIVATE);
+        launchCounter = sharedPref.getInt(getString(R.string.saved_launch_counter), 0);
+        ++launchCounter;
+        Log.i(TAG, "launchCounter: " + launchCounter);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.saved_launch_counter), launchCounter);
+        editor.commit();
+        
+	    Log.i(TAG, "in onCreate() of SelectionFragment");
 	    setRetainInstance(true);
 	    // TODO: if keep being launch, show a loading during the makeFriendsRequest! ie. Updating list of friends...
+	}
+	
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	    super.onCreateView(inflater, container, savedInstanceState);
+	    View view = inflater.inflate(R.layout.selection, container, false);
+	    
+	    final GestureDetector gesture = new GestureDetector(getActivity(), new SimpleGestureFilter());
+
+	    view.setOnTouchListener(new View.OnTouchListener() {
+	        @Override
+	        public boolean onTouch(View v, MotionEvent event) {
+	            return gesture.onTouchEvent(event);
+	        }
+	    });
+	    
+	    profilePictureFriends[0] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_1);
+	    profilePictureFriends[1] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_2);
+	    profilePictureFriends[0].setCropped(true);
+	    profilePictureFriends[1].setCropped(true);   
+	    for (int i = 0; i < profilePictureFriends.length; ++i) {
+    		final int f = i;
+	    	profilePictureFriends[i].setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					incrementScore(f);
+					showNextFriends();
+				}
+			});
+	    }
+	    userNameFriends[0] = (TextView) view.findViewById(R.id.user_name_friend_1);
+	    userNameFriends[1] = (TextView) view.findViewById(R.id.user_name_friend_2);
+	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
+	    
+	    // Check for an open session
+	    Session session = Session.getActiveSession();
+	  
+	    if (timeToUpdate()) {
+		    if (session != null && session.isOpened()) {
+		        // Get the user's friends
+		        makeFriendsRequest(session);
+		    }
+	    }
+	    else {
+	    	if (firstFragmentApparition) {
+	    		randomFriends = pickTwoRandomFriends();
+	    		firstFragmentApparition = false;
+	    	}
+	    	profilePictureFriends[0].setVisibility(View.VISIBLE);
+			profilePictureFriends[1].setVisibility(View.VISIBLE);
+			userNameFriends[0].setVisibility(View.VISIBLE);
+			userNameFriends[1].setVisibility(View.VISIBLE);
+		    displayFriends(randomFriends[0], randomFriends[1]);
+	    }
+	    
+	    return view;
 	}
 	
 	@Override
@@ -150,61 +218,11 @@ public class SelectionFragment extends Fragment implements Constants {
 	    uiHelper.onDestroy();
 	}
 	
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-	    super.onCreateView(inflater, container, savedInstanceState);
-	    View view = inflater.inflate(R.layout.selection, container, false);
-	    
-	    final GestureDetector gesture = new GestureDetector(getActivity(), new SimpleGestureFilter());
-
-	    view.setOnTouchListener(new View.OnTouchListener() {
-	        @Override
-	        public boolean onTouch(View v, MotionEvent event) {
-	            return gesture.onTouchEvent(event);
-	        }
-	    });
-	    
-	    profilePictureFriends[0] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_1);
-	    profilePictureFriends[1] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_2);
-	    profilePictureFriends[0].setCropped(true);
-	    profilePictureFriends[1].setCropped(true);
-	    
-	    
-	    for (int i = 0; i < profilePictureFriends.length; ++i) {
-    		final int f = i;
-	    	profilePictureFriends[i].setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					incrementScore(f);
-					showNextFriends();
-				}
-			});
-	    }
-	    
-	    userNameFriends[0] = (TextView) view.findViewById(R.id.user_name_friend_1);
-	    userNameFriends[1] = (TextView) view.findViewById(R.id.user_name_friend_2);
-	    
-	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
-	    
-	    
-	    
-	    // Check for an open session
-	    Session session = Session.getActiveSession();
-	    if (firstTime) {
-		    if (session != null && session.isOpened()) {
-		        // Get the user's friends
-		        makeFriendsRequest(session);
-		    }
-	    }
-	    displayFriends(randomFriends[0], randomFriends[1]);
-	    
-	    return view;
-	}
-
 
 	// TODO: move everything below to another class?
 	private void makeFriendsRequest(final Session session) {
 		// TODO: STOP BLOCKING UI THREAD!! Probably need to do the add friend and request into another thread!!!
-		Toast.makeText(getActivity(), "Fetching Facebook friends.", Toast.LENGTH_LONG).show();
+		Toast.makeText(getActivity(), "Fetching Facebook friends.", Toast.LENGTH_SHORT).show();
 		loadingCircle.setVisibility(View.VISIBLE);
 		String friendsListQuery = "SELECT uid, first_name, last_name FROM user WHERE uid IN " +
 	              	"(SELECT uid2 FROM friend WHERE uid1 = me() LIMIT 1000)";
@@ -216,7 +234,7 @@ public class SelectionFragment extends Fragment implements Constants {
             HttpMethod.GET,                 
             new Request.Callback() {       
                 public void onCompleted(Response response) {
-                    //Log.d(TAG, "Result: " + response.toString());
+                    //Log.i(TAG, "Result: " + response.toString());
                     // TODO: refactor for taking care of the json somewhere else
                 	try {
                     	GraphObject graphObject = response.getGraphObject();
@@ -232,9 +250,9 @@ public class SelectionFragment extends Fragment implements Constants {
                             		String lastName  = friend.get("last_name").toString();
                             		addFriend(uid, firstName, lastName);	
                             	}
+                            	firstFragmentApparition = false;
                             	randomFriends = pickTwoRandomFriends();
                         	    displayFriends(randomFriends[0], randomFriends[1]);
-                		    	firstTime = false;
                         	    loadingCircle.setVisibility(View.GONE);
                             }
                             catch (JSONException e) {
@@ -255,9 +273,11 @@ public class SelectionFragment extends Fragment implements Constants {
 
 	
 	private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
-	    if (session != null && session.isOpened()) {
-	        makeFriendsRequest(session);
-	    }
+		if (timeToUpdate()) { 
+			if (session != null && session.isOpened()) {
+		        makeFriendsRequest(session);
+		    }
+		}
 	}
 	
 	private void addFriend(long uid, String firstName, String lastName) {
@@ -269,7 +289,16 @@ public class SelectionFragment extends Fragment implements Constants {
 		int unixTime = (int) (System.currentTimeMillis() / 1000L);
 		values.put(CREATED_AT, unixTime);
 		values.put(UPDATED_AT, unixTime);
-		db.insertOrThrow(TABLE_NAME, null, values);
+		try {
+			db.insertOrThrow(TABLE_NAME, null, values);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		profilePictureFriends[0].setVisibility(View.VISIBLE);
+		profilePictureFriends[1].setVisibility(View.VISIBLE);
+		userNameFriends[0].setVisibility(View.VISIBLE);
+		userNameFriends[1].setVisibility(View.VISIBLE);
 	}
 	
 	private int[] pickTwoRandomFriends() {
@@ -290,9 +319,9 @@ public class SelectionFragment extends Fragment implements Constants {
 				randomFriends[counter++] = randomFriend;	
 			}
 		}
-		Log.d(TAG, "friendCount: " + friendCount);
-		Log.d(TAG, "friend1: " + randomFriends[0]);
-		Log.d(TAG, "friend2: " + randomFriends[1]);
+		Log.i(TAG, "friendCount: " + friendCount);
+		Log.i(TAG, "friend1: " + randomFriends[0]);
+		Log.i(TAG, "friend2: " + randomFriends[1]);
 		
 		return randomFriends;
 	}
@@ -319,8 +348,8 @@ public class SelectionFragment extends Fragment implements Constants {
 		
 		// TODO: Clean Debug
 		//for (int j = 0; j < 2; ++j) {
-		//	Log.d(TAG, "id" + j + ": " + friendsFacebookID[j]);
-		//	Log.d(TAG, "name" + j + ": " + friendsName[j]);
+		//	Log.i(TAG, "id" + j + ": " + friendsFacebookID[j]);
+		//	Log.i(TAG, "name" + j + ": " + friendsName[j]);
 		//}
 		
 		profilePictureFriends[0].setProfileId(Long.toString(friendsFacebookID[0]));
@@ -331,12 +360,13 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private void incrementScore(int friend) {
+		// TODO: plante si tente de toucher avant finir de loader: cacher profileView...
 		int idFriend = randomFriends[friend];
-		Log.d(TAG, "id friend touched: " + idFriend);
+		Log.i(TAG, "id friend touched: " + idFriend);
 		SQLiteDatabase db = friends.getWritableDatabase();
 		Cursor cursor = db.rawQuery("SELECT first_name, last_name FROM friends WHERE _id = " + idFriend + ";", null);
 		cursor.moveToNext();
-		Log.d(TAG, "friend touched: " + idFriend + " - " + cursor.getString(0) + " " + cursor.getString(1));
+		Log.i(TAG, "friend touched: " + idFriend + " - " + cursor.getString(0) + " " + cursor.getString(1));
 		cursor.close();
 		// TODO: unit test to check if score incremented
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + SCORE + " = " + SCORE + " + 1 " + "WHERE " + _ID + " = " + idFriend + ";");
@@ -345,7 +375,7 @@ public class SelectionFragment extends Fragment implements Constants {
 		alreadySelectedFriendsId.add(Integer.valueOf(idFriend));
 		++friendsSelected;
 		// TODO: clean debug
-		//Log.d(TAG, "friendsSelected: " + friendsSelected);
+		//Log.i(TAG, "friendsSelected: " + friendsSelected);
 		
 	}
 	
@@ -360,9 +390,14 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private void showFriendsRank() {
-		Intent myIntent = new Intent(getActivity(), RanksActivity.class);
-		myIntent.putIntegerArrayListExtra("alreadySelectedFriendsId", alreadySelectedFriendsId);
-		getActivity().startActivity(myIntent);
+		Intent launchRankActivity = new Intent(getActivity(), RanksActivity.class);
+		launchRankActivity.putIntegerArrayListExtra("alreadySelectedFriendsId", alreadySelectedFriendsId);
+		getActivity().startActivity(launchRankActivity);
+	}
+	
+    // return true only the very first time AND first fragment apparition) OR every deltaLaunch launches AND first fragment apparition
+	private boolean timeToUpdate() {
+		return (launchCounter == 1 || launchCounter % deltaLaunch ==  0) && firstFragmentApparition;
 	}
 	
 	

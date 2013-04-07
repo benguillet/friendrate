@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class FriendsData extends SQLiteOpenHelper implements Constants {
 	private final static String DATABASE_NAME = "sack.db";
-	private final static int DATABASE_VERSION = 4;
+	private final static int DATABASE_VERSION = 5;
 	
 	public FriendsData(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);

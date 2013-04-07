@@ -9,6 +9,8 @@ public interface Constants extends BaseColumns {
 	public static final int SELECTION      = 1;
 	public static final int SETTINGS 	   = 2;
 	public static final int FRAGMENT_COUNT = SETTINGS + 1;
+	
+	public static final int deltaLaunch    = 100;
 
 	public static final String TABLE_NAME  = "friends";
 	

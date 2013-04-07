@@ -9,4 +9,6 @@
     <string name="action_settings">Settings</string>
     <string name="selection_rank">Selection Rank</string>
     <string name="general_rank">General Rank</string>
+    <string name="saved_launch_counter">com_benjaminguillet_friend_rate_launcher_counter</string>
+    <string name="saved_launch_counter_default">0</string>
 </resources>

@@ -26,14 +26,16 @@
 		            android:layout_width="wrap_content"
 		            android:layout_gravity="center"
 		            android:gravity="center_horizontal"
-		            facebook:preset_size="normal" />
+		            facebook:preset_size="normal" 
+		            android:visibility="gone"  />
 	            <TextView
 		            android:id="@+id/user_name_friend_1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:layout_gravity="center"
 		            android:textColor="#333"
-		            android:textSize="18sp" />
+		            android:textSize="18sp" 
+		            android:visibility="gone" />
 	    </LinearLayout>
     
 	    <LinearLayout
@@ -49,14 +51,16 @@
 	                android:layout_width="wrap_content"
 	                android:layout_gravity="center"
 	                android:gravity="center_horizontal"
-	                facebook:preset_size="normal" />
+	                facebook:preset_size="normal" 
+	                android:visibility="gone"/>
 	            <TextView
 	                android:id="@+id/user_name_friend_2"
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
 	                android:layout_gravity="center"
 	                android:textColor="#333"
-	                android:textSize="18sp" />
+	                android:textSize="18sp" 
+	                android:visibility="gone" />
 	    </LinearLayout>
     </LinearLayout>
 
