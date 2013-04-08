@@ -108,7 +108,6 @@ public class MainActivity extends FragmentActivity implements Constants {
 	            // If the session state is open:
 	            // Show the authenticated fragment
 	            showFragment(SELECTION, false);
-	            // TODO: Here add if selection all made then show rank
 	        } else if (state.isClosed()) {
 	            // If the session state is closed:
 	            // Show the login fragment
