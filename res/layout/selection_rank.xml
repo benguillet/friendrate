@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:id="@+id/rank_left"
-        android:layout_width="match_parent"
+        android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical" >
@@ -17,35 +17,56 @@
         <TextView
             android:id="@+id/rank1"
             android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />  
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp"  />  
         <TextView
             android:id="@+id/rank2"
             android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/rank3"
             android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         
         <TextView
             android:id="@+id/rank4"
             android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
+        
         <TextView
             android:id="@+id/rank5"
             android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         
     </LinearLayout>
     
     <LinearLayout
         android:id="@+id/rank_right"
-        android:layout_width="match_parent"
+        android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical">
@@ -54,27 +75,49 @@
             android:id="@+id/rank6"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/rank7"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/rank8"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/rank9"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
+        
         <TextView
             android:id="@+id/rank10"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" 
+            android:textSize="16sp" />
+        
     </LinearLayout>
 
 </LinearLayout>

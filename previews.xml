@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<previews>
+
+    <preview
+        name="Nexus7"
+        config="layout-sw600dp-w961dp-h600dp-large-notlong-land-notnight-tvdpi-finger-keyssoft-nokeys-navhidden-nonav-1280x800-v17"
+        device="Nexus 7"
+        devicestate="Portrait"
+        target="Android 4.2.2"
+        theme="@style/AppTheme" >
+    </preview>
+    <preview
+        name="NexusS"
+        config="layout-sw320dp-w533dp-h320dp-normal-long-land-notnight-hdpi-finger-keyssoft-nokeys-navhidden-nonav-800x480-v17"
+        device="Nexus S"
+        devicestate="Portrait"
+        target="Android 4.2.2"
+        theme="@style/AppTheme" >
+    </preview>
+    <preview
+        name="NexusS"
+        activity="com.scopely.sack.MainActivity"
+        config="layout-sw320dp-w533dp-h320dp-normal-long-land-notnight-hdpi-finger-keyssoft-nokeys-navhidden-nonav-800x480-v17"
+        device="Nexus S"
+        devicestate="Landscape"
+        target="Android 4.2.2"
+        theme="@style/AppTheme" >
+    </preview>
+
+</previews>

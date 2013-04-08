@@ -19,48 +19,48 @@
             android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp"  />  
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp"  />  
         <TextView
             android:id="@+id/rank2"
             android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         <TextView
             android:id="@+id/rank3"
             android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         
         <TextView
             android:id="@+id/rank4"
             android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         
         <TextView
             android:id="@+id/rank5"
             android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         
     </LinearLayout>
     
@@ -76,47 +76,47 @@
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         <TextView
             android:id="@+id/rank7"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         <TextView
             android:id="@+id/rank8"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         <TextView
             android:id="@+id/rank9"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         
         <TextView
             android:id="@+id/rank10"
             android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp" 
-            android:textSize="16sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" 
+            android:textSize="30sp" />
         
     </LinearLayout>
 

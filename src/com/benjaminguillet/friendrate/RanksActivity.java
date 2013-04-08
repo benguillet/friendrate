@@ -16,9 +16,7 @@ public class RanksActivity extends SherlockFragmentActivity implements Constants
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.ranks);
-	    // Notice that setContentView() is not used, because we use the root
-	    // android.R.id.content as the container for each fragment
+	    setContentView(R.layout.ranks);	
 	    
 	    // setup action bar for tabs
 	    ActionBar actionBar = getSupportActionBar();
@@ -72,24 +70,17 @@ public class RanksActivity extends SherlockFragmentActivity implements Constants
 
 		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "tab created");
 			ft.replace(R.id.ranks_container, mFragment);			
 		}
 
 		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "in  onTabUnselected");
-			//FragmentTransaction ft = fm.beginTransaction();
 			ft.remove(mFragment);			
 		}
 
 		@Override
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-			// Do nothing.
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "tab reselectiod");			
+			// Do nothing.		
 		}
 	}
 }

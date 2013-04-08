@@ -10,7 +10,10 @@ public interface Constants extends BaseColumns {
 	public static final int SETTINGS 	   = 2;
 	public static final int FRAGMENT_COUNT = SETTINGS + 1;
 	
-	public static final int deltaLaunch    = 100;
+	/**
+	 * Define number of launches between to friends query to facebook
+	 */
+	public static final int deltaLaunch    = 50;
 
 	public static final String TABLE_NAME  = "friends";
 	

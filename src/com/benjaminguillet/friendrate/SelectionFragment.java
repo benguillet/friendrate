@@ -278,12 +278,9 @@ public class SelectionFragment extends Fragment implements Constants, OnClickLis
 	}
 	
 	private int[] pickTwoRandomFriends() {
-		Log.i(TAG, "before getFriendCount friendCount: " + this.friendCount);
 		if (this.friendCount == 0) {
 			this.friendCount = getFriendCount();
 		}
-		Log.i(TAG, "after getFriendCount friendCount: " + this.friendCount);
-
 		
 		Random randomGenerator = new Random();
 		int[] randomFriends = new int[2];
@@ -294,8 +291,9 @@ public class SelectionFragment extends Fragment implements Constants, OnClickLis
 				randomFriends[counter++] = randomFriend;	
 			}
 		}
-		Log.i(TAG, "randomFriends[0] " + randomFriends[0]);
-		Log.i(TAG, "randomFriends[1]: " + randomFriends[1]);
+		// TODO: debug
+		//Log.i(TAG, "randomFriends[0] " + randomFriends[0]);
+		//Log.i(TAG, "randomFriends[1]: " + randomFriends[1]);
 		
 		return randomFriends;
 	}
