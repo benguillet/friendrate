@@ -1,4 +1,4 @@
-package com.scopely.sack;
+package com.benjaminguillet.friendrate;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -36,6 +36,7 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphObject;
 import com.facebook.widget.ProfilePictureView;
+
 
 public class SelectionFragment extends Fragment implements Constants, OnClickListener {
 	private static final int REAUTH_ACTIVITY_CODE = 100;

@@ -1,23 +1,24 @@
-package com.scopely.sack;
+package com.benjaminguillet.friendrate;
 
 import java.util.ArrayList;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.MenuItem;
 
-public class RanksActivity extends FragmentActivity implements Constants {
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
+
+public class RanksActivity extends SherlockFragmentActivity implements Constants {
 	
 	public static class RanksTabListener<T extends Fragment> implements ActionBar.TabListener {
 	    private final FragmentActivity mActivity;
 	    private final Class<T> mClass;
-	    private FragmentManager fm;
+	    //private FragmentManager fm;
 	    private Fragment mFragment;
 
 	    /** Constructor used each time a new tab is created.
@@ -29,33 +30,53 @@ public class RanksActivity extends FragmentActivity implements Constants {
 	        mActivity = activity;
 	        mClass = clz;
             mFragment = Fragment.instantiate(mActivity, mClass.getName());
-	    	fm = mActivity.getSupportFragmentManager();
+	    	//fm = mActivity.getSupportFragmentManager();
 	    }
 
+//		@Override
+//		public void onTabSelected(Tab tab, android.app.FragmentTransaction unused) {
+//			// TODO: DEBUG LOG
+//			//Log.i(TAG, "tab created");
+//			FragmentTransaction ft = fm.beginTransaction();
+//			ft.replace(R.id.ranks_container, mFragment);
+//			ft.commit();
+//		}
+//		
+//		@Override
+//		public void onTabReselected(Tab tab, android.app.FragmentTransaction ftunused) {
+//			
+//		}
+//
+//
+//		@Override
+//		public void onTabUnselected(Tab tab, android.app.FragmentTransaction unused) {
+//			
+//		}
+
 		@Override
-		public void onTabSelected(Tab tab, android.app.FragmentTransaction unused) {
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
 			// TODO: DEBUG LOG
 			//Log.i(TAG, "tab created");
-			FragmentTransaction ft = fm.beginTransaction();
 			ft.replace(R.id.ranks_container, mFragment);
-			ft.commit();
-		}
-		
-		@Override
-		public void onTabReselected(Tab tab, android.app.FragmentTransaction ftunused) {
-			// Do nothing.
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "tab reselectiod");
+			//ft.commit();
+			
 		}
 
-
 		@Override
-		public void onTabUnselected(Tab tab, android.app.FragmentTransaction unused) {
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			// TODO: DEBUG LOG
 			//Log.i(TAG, "in  onTabUnselected");
-			FragmentTransaction ft = fm.beginTransaction();
+			//FragmentTransaction ft = fm.beginTransaction();
 			ft.remove(mFragment);
-			ft.commit();
+			//ft.commit();
+			
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			// Do nothing.
+			// TODO: DEBUG LOG
+			//Log.i(TAG, "tab reselectiod");			
 		}
 	}
 	
@@ -69,7 +90,7 @@ public class RanksActivity extends FragmentActivity implements Constants {
 	    // android.R.id.content as the container for each fragment
 	    
 	    // setup action bar for tabs
-	    ActionBar actionBar = getActionBar();
+	    ActionBar actionBar = getSupportActionBar();
 	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	    actionBar.setDisplayShowTitleEnabled(false);
 	    actionBar.setDisplayHomeAsUpEnabled(true);

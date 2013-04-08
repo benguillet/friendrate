@@ -1,9 +1,9 @@
-package com.scopely.sack;
+package com.benjaminguillet.friendrate;
 
 import android.provider.BaseColumns;
 
 public interface Constants extends BaseColumns {
-	public static final String TAG = "com.scopely.sack";
+	public static final String TAG = "com.benjaminguillet.friendrate";
 	
 	public static final int SPLASH         = 0;
 	public static final int SELECTION      = 1;

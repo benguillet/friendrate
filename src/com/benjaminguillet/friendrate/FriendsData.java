@@ -1,4 +1,4 @@
-package com.scopely.sack;
+package com.benjaminguillet.friendrate;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

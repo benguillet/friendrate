@@ -1,4 +1,4 @@
-package com.scopely.sack;
+package com.benjaminguillet.friendrate;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
