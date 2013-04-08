@@ -54,7 +54,7 @@ public class GeneralRankFragment extends Fragment implements Constants {
 	    topFriendsQuery.append(TABLE_NAME);
 	    topFriendsQuery.append(" ORDER BY ");
 	    topFriendsQuery.append(SCORE);
-	    topFriendsQuery.append(" DESC limit 10;");
+	    topFriendsQuery.append(" DESC LIMIT 10;");
 	    
 	    Cursor cursor = db.rawQuery(topFriendsQuery.toString(), null);
 	    int  i = 0;

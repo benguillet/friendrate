@@ -6,7 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class FriendsData extends SQLiteOpenHelper implements Constants {
 	private final static String DATABASE_NAME = "sack.db";
-	private final static int DATABASE_VERSION = 5;
+	private final static int DATABASE_VERSION = 7;
+	public static boolean updated = false;
 	
 	public FriendsData(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,6 +27,7 @@ public class FriendsData extends SQLiteOpenHelper implements Constants {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+		updated = true;
 		onCreate(db);
 	}
 }

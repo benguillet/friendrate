@@ -22,6 +22,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,15 +37,17 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphObject;
 import com.facebook.widget.ProfilePictureView;
 
-public class SelectionFragment extends Fragment implements Constants {
+public class SelectionFragment extends Fragment implements Constants, OnClickListener {
 	private static final int REAUTH_ACTIVITY_CODE = 100;
 	
 	private ProfilePictureView[] profilePictureFriends;
 	private TextView userNameFriends[];
 	private ProgressBar loadingCircle;
+	private ProgressBar progressBar;
+	private TextView progressText;
 	
 	private FriendsData friends;
-	private int[] randomFriends;
+	//private int[] randomFriends;
 	private int[] lastRandomFriends;
 	private ArrayList<Integer> alreadySelectedFriendsId;
 	private long[] friendsFacebookID;
@@ -108,25 +111,25 @@ public class SelectionFragment extends Fragment implements Constants {
 	    uiHelper.onCreate(savedInstanceState);
 	    friends = new FriendsData(getActivity());
 	    alreadySelectedFriendsId = new ArrayList<Integer>();
-	    randomFriends = new int[2];
+	    //randomFriends = new int[2];
 	    profilePictureFriends = new ProfilePictureView[2];
 	    userNameFriends = new TextView[2];
 	    lastRandomFriends = new int[2];
 	    friendsFacebookID = new long[2];
-		friendsName     = new String[2];
+		friendsName = new String[2];
 	    friendCount = 0;
 	    friendsSelected = 0;
-	    firstFragmentApparition = true; 
+	    firstFragmentApparition = true;
 	    
 	    SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_launch_counter),Context.MODE_PRIVATE);
         launchCounter = sharedPref.getInt(getString(R.string.saved_launch_counter), 0);
         ++launchCounter;
-        Log.i(TAG, "launchCounter: " + launchCounter);
+        //Log.i(TAG, "launchCounter: " + launchCounter);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.saved_launch_counter), launchCounter);
         editor.commit();
         
-	    Log.i(TAG, "in onCreate() of SelectionFragment");
+	    //Log.i(TAG, "in onCreate() of SelectionFragment");
 	    setRetainInstance(true);
 	    // TODO: if keep being launch, show a loading during the makeFriendsRequest! ie. Updating list of friends...
 	}
@@ -148,24 +151,20 @@ public class SelectionFragment extends Fragment implements Constants {
 	    profilePictureFriends[1] = (ProfilePictureView) view.findViewById(R.id.profile_pic_friend_2);
 	    profilePictureFriends[0].setCropped(true);
 	    profilePictureFriends[1].setCropped(true);   
-	    for (int i = 0; i < profilePictureFriends.length; ++i) {
-    		final int f = i;
-	    	profilePictureFriends[i].setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					incrementScore(f);
-					showNextFriends();
-				}
-			});
-	    }
+	    profilePictureFriends[0].setOnClickListener(this);
+	    profilePictureFriends[1].setOnClickListener(this);
+	    
 	    userNameFriends[0] = (TextView) view.findViewById(R.id.user_name_friend_1);
 	    userNameFriends[1] = (TextView) view.findViewById(R.id.user_name_friend_2);
 	    loadingCircle = (ProgressBar) view.findViewById(R.id.loadingCircle);
+	    progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+	    progressBar.setProgress(0);
+	    progressText = (TextView) view.findViewById(R.id.progressTextDynamic);
 	    
 	    // Check for an open session
 	    Session session = Session.getActiveSession();
 	  
-	    if (timeToUpdate()) {
+	    if (timeToUpdate() || FriendsData.updated) {
 		    if (session != null && session.isOpened()) {
 		        // Get the user's friends
 		        makeFriendsRequest(session);
@@ -173,14 +172,16 @@ public class SelectionFragment extends Fragment implements Constants {
 	    }
 	    else {
 	    	if (firstFragmentApparition) {
-	    		randomFriends = pickTwoRandomFriends();
+	    		int[] randomFriends = pickTwoRandomFriends();
+	    		displayFriends(randomFriends[0], randomFriends[1]);
 	    		firstFragmentApparition = false;
 	    	}
 	    	profilePictureFriends[0].setVisibility(View.VISIBLE);
 			profilePictureFriends[1].setVisibility(View.VISIBLE);
 			userNameFriends[0].setVisibility(View.VISIBLE);
 			userNameFriends[1].setVisibility(View.VISIBLE);
-		    displayFriends(randomFriends[0], randomFriends[1]);
+			displayFriends(lastRandomFriends[0], lastRandomFriends[1]);
+		    
 	    }
 	    
 	    return view;
@@ -218,6 +219,20 @@ public class SelectionFragment extends Fragment implements Constants {
 	    uiHelper.onDestroy();
 	}
 	
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		    case R.id.profile_pic_friend_1:
+				incrementScore(lastRandomFriends[0]);
+		        break;
+		    case R.id.profile_pic_friend_2:
+		       incrementScore(lastRandomFriends[1]);
+		       break;
+	    }   
+		showNextFriends();
+	}
+
+	
 
 	// TODO: move everything below to another class?
 	private void makeFriendsRequest(final Session session) {
@@ -251,7 +266,7 @@ public class SelectionFragment extends Fragment implements Constants {
                             		addFriend(uid, firstName, lastName);	
                             	}
                             	firstFragmentApparition = false;
-                            	randomFriends = pickTwoRandomFriends();
+                            	int[] randomFriends = pickTwoRandomFriends();
                         	    displayFriends(randomFriends[0], randomFriends[1]);
                         	    loadingCircle.setVisibility(View.GONE);
                             }
@@ -302,55 +317,72 @@ public class SelectionFragment extends Fragment implements Constants {
 	}
 	
 	private int[] pickTwoRandomFriends() {
-		if (friendCount == 0) {
-			SQLiteDatabase db = friends.getReadableDatabase();
-			Cursor fCount = db.rawQuery("SELECT COUNT(*) FROM "+ TABLE_NAME +";", null);
-			fCount.moveToFirst();
-			friendCount = fCount.getInt(0);
-			fCount.close();
+		Log.i(TAG, "before getFriendCount friendCount: " + this.friendCount);
+		if (this.friendCount == 0) {
+			this.friendCount = getFriendCount();
 		}
+		Log.i(TAG, "after getFriendCount friendCount: " + this.friendCount);
+
 		
 		Random randomGenerator = new Random();
 		int[] randomFriends = new int[2];
 		int counter = 0;
-		while(counter < 2) {
-			Integer randomFriend = Integer.valueOf(randomGenerator.nextInt(friendCount));
+		while (counter < 2) {
+			Integer randomFriend = Integer.valueOf(randomGenerator.nextInt(this.friendCount));
 			if (!alreadySelectedFriendsId.contains(randomFriend)) {
 				randomFriends[counter++] = randomFriend;	
 			}
 		}
-		Log.i(TAG, "friendCount: " + friendCount);
-		Log.i(TAG, "friend1: " + randomFriends[0]);
-		Log.i(TAG, "friend2: " + randomFriends[1]);
+		Log.i(TAG, "randomFriends[0] " + randomFriends[0]);
+		Log.i(TAG, "randomFriends[1]: " + randomFriends[1]);
 		
 		return randomFriends;
 	}
+	
+	private int getFriendCount() {
+		int friendCount = 0;
+		SQLiteDatabase db = friends.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME, null);
+	    if (cursor != null) {
+	        cursor.moveToFirst();
+	        if (cursor.getInt(0) == 0) {
+	        	Log.d(TAG, "DATABASE IS EMPTY");
+	        }
+	        else {
+	        	friendCount = cursor.getInt(0);
+	        }
+	        cursor.close();
+	    }
+	    else {
+	    	Log.d(TAG, "DATABASE DOESN'T EXIST!");
+	    }
+		return friendCount;
+	}
 
 	private void displayFriends(int friend1, int friend2) {
-		// Make the query only if new info friends requested
-		if (lastRandomFriends[0] != friend1 || lastRandomFriends[1] != friend2) {
+		// Execute the query only if new friend infos requested
+		if ((lastRandomFriends[0] != friend1) || (lastRandomFriends[1] != friend2)) {
 			SQLiteDatabase db = friends.getReadableDatabase();
+			StringBuilder friendInfoQuery = new StringBuilder();
+			friendInfoQuery.append("SELECT " + _ID + ", " + FACEBOOK_ID + ", " + FIRST_NAME + ", " + LAST_NAME);
+			friendInfoQuery.append(" FROM " + TABLE_NAME);
+			friendInfoQuery.append(" WHERE " + _ID + " IN (" + friend1 + ", " + friend2 + ")");
 			
-			String[] FRIEND = {FACEBOOK_ID, FIRST_NAME, LAST_NAME};
-			String WHERE    =  _ID + " = " + friend1 + " OR " + _ID + " = " + friend2;
-			Cursor cursor = db.query(TABLE_NAME, FRIEND, WHERE, null, null, null, null);
-			
-			int i = 0;
+			Cursor cursor = db.rawQuery(friendInfoQuery.toString(), null);
 			while (cursor.moveToNext()) {
-				friendsFacebookID[i] = cursor.getLong(0);
-				friendsName[i] = cursor.getString(1) + " " + cursor.getString(2);
-				++i;
+				if (cursor.getInt(0) == friend1) {
+					friendsFacebookID[0] = cursor.getLong(1);
+					friendsName[0] = cursor.getString(2) + " " + cursor.getString(3);
+				}
+				else if (cursor.getInt(0) == friend2) {
+					friendsFacebookID[1] = cursor.getLong(1);
+					friendsName[1] = cursor.getString(2) + " " + cursor.getString(3);
+				}
 			}
 			cursor.close();
 			lastRandomFriends[0] = friend1;
 			lastRandomFriends[1] = friend2;
 		}
-		
-		// TODO: Clean Debug
-		//for (int j = 0; j < 2; ++j) {
-		//	Log.i(TAG, "id" + j + ": " + friendsFacebookID[j]);
-		//	Log.i(TAG, "name" + j + ": " + friendsName[j]);
-		//}
 		
 		profilePictureFriends[0].setProfileId(Long.toString(friendsFacebookID[0]));
 		profilePictureFriends[1].setProfileId(Long.toString(friendsFacebookID[1]));
@@ -359,29 +391,21 @@ public class SelectionFragment extends Fragment implements Constants {
 	    userNameFriends[1].setText(friendsName[1]);
 	}
 	
-	private void incrementScore(int friend) {
-		// TODO: plante si tente de toucher avant finir de loader: cacher profileView...
-		int idFriend = randomFriends[friend];
-		Log.i(TAG, "id friend touched: " + idFriend);
+	private void incrementScore(int idFriend) {
 		SQLiteDatabase db = friends.getWritableDatabase();
-		Cursor cursor = db.rawQuery("SELECT first_name, last_name FROM friends WHERE _id = " + idFriend + ";", null);
-		cursor.moveToNext();
-		Log.i(TAG, "friend touched: " + idFriend + " - " + cursor.getString(0) + " " + cursor.getString(1));
-		cursor.close();
 		// TODO: unit test to check if score incremented
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + SCORE + " = " + SCORE + " + 1 " + "WHERE " + _ID + " = " + idFriend + ";");
 		// TODO: unit test to check if friendSelected incremented
-		// TODO: use tabuListFriend.length to check if more than 10? No more need of friendsSelected
 		alreadySelectedFriendsId.add(Integer.valueOf(idFriend));
+		// TODO: no need of friendSelected
 		++friendsSelected;
-		// TODO: clean debug
-		//Log.i(TAG, "friendsSelected: " + friendsSelected);
-		
+		progressBar.setProgress(friendsSelected);
+		progressText.setText(Integer.toString(friendsSelected));
 	}
 	
 	private void showNextFriends() {
 		if (friendsSelected < 10) {
-			randomFriends = pickTwoRandomFriends();
+			int[] randomFriends = pickTwoRandomFriends();
 			displayFriends(randomFriends[0], randomFriends[1]);
 		}
 		else {
