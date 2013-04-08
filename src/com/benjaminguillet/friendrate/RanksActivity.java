@@ -1,7 +1,5 @@
 package com.benjaminguillet.friendrate;
 
-import java.util.ArrayList;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,73 +12,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 public class RanksActivity extends SherlockFragmentActivity implements Constants {
-	
-	public static class RanksTabListener<T extends Fragment> implements ActionBar.TabListener {
-	    private final FragmentActivity mActivity;
-	    private final Class<T> mClass;
-	    //private FragmentManager fm;
-	    private Fragment mFragment;
-
-	    /** Constructor used each time a new tab is created.
-	      * @param activity  The host Activity, used to instantiate the fragment
-	      * @param tag  The identifier tag for the fragment
-	      * @param clz  The fragment's Class, used to instantiate the fragment
-	      */
-	    public RanksTabListener(FragmentActivity activity, String tag, Class<T> clz) {
-	        mActivity = activity;
-	        mClass = clz;
-            mFragment = Fragment.instantiate(mActivity, mClass.getName());
-	    	//fm = mActivity.getSupportFragmentManager();
-	    }
-
-//		@Override
-//		public void onTabSelected(Tab tab, android.app.FragmentTransaction unused) {
-//			// TODO: DEBUG LOG
-//			//Log.i(TAG, "tab created");
-//			FragmentTransaction ft = fm.beginTransaction();
-//			ft.replace(R.id.ranks_container, mFragment);
-//			ft.commit();
-//		}
-//		
-//		@Override
-//		public void onTabReselected(Tab tab, android.app.FragmentTransaction ftunused) {
-//			
-//		}
-//
-//
-//		@Override
-//		public void onTabUnselected(Tab tab, android.app.FragmentTransaction unused) {
-//			
-//		}
-
-		@Override
-		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "tab created");
-			ft.replace(R.id.ranks_container, mFragment);
-			//ft.commit();
-			
-		}
-
-		@Override
-		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "in  onTabUnselected");
-			//FragmentTransaction ft = fm.beginTransaction();
-			ft.remove(mFragment);
-			//ft.commit();
-			
-		}
-
-		@Override
-		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-			// Do nothing.
-			// TODO: DEBUG LOG
-			//Log.i(TAG, "tab reselectiod");			
-		}
-	}
-	
-	private ArrayList<Integer> alreadySelectedFriendsId;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +53,43 @@ public class RanksActivity extends SherlockFragmentActivity implements Constants
 	    return super.onOptionsItemSelected(item);
 	}
 	
-	public ArrayList<Integer> getAlreadySelectedFriendsId() {
-		return this.alreadySelectedFriendsId;
+	public static class RanksTabListener<T extends Fragment> implements ActionBar.TabListener {
+	    private final FragmentActivity mActivity;
+	    private final Class<T> mClass;
+	    private Fragment mFragment;
+
+	    /** Constructor used each time a new tab is created.
+	      * @param activity  The host Activity, used to instantiate the fragment
+	      * @param tag  The identifier tag for the fragment
+	      * @param clz  The fragment's Class, used to instantiate the fragment
+	      */
+	    public RanksTabListener(FragmentActivity activity, String tag, Class<T> clz) {
+	        mActivity = activity;
+	        mClass = clz;
+            mFragment = Fragment.instantiate(mActivity, mClass.getName());
+	    }
+
+
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			// TODO: DEBUG LOG
+			//Log.i(TAG, "tab created");
+			ft.replace(R.id.ranks_container, mFragment);			
+		}
+
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			// TODO: DEBUG LOG
+			//Log.i(TAG, "in  onTabUnselected");
+			//FragmentTransaction ft = fm.beginTransaction();
+			ft.remove(mFragment);			
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			// Do nothing.
+			// TODO: DEBUG LOG
+			//Log.i(TAG, "tab reselectiod");			
+		}
 	}
 }

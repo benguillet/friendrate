@@ -48,7 +48,6 @@ public class SelectionFragment extends Fragment implements Constants, OnClickLis
 	private TextView progressText;
 	
 	private FriendsData friends;
-	//private int[] randomFriends;
 	private int[] lastRandomFriends;
 	private ArrayList<Integer> alreadySelectedFriendsId;
 	private long[] friendsFacebookID;
@@ -65,45 +64,6 @@ public class SelectionFragment extends Fragment implements Constants, OnClickLis
 	        onSessionStateChange(session, state, exception);
 	    }
 	};
-	
-	private class SimpleGestureFilter extends SimpleOnGestureListener {
-		public SimpleGestureFilter() {
-			super();
-		}
-		
-		@Override
-	    public boolean onDown(MotionEvent e) {
-	        return true;
-	    }
-
-	    @Override
-	    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-	        float velocityY) {
-	        //Log.i(TAG, "onFling has been called!");
-	        final int SWIPE_MIN_DISTANCE = 120;
-	        final int SWIPE_MAX_OFF_PATH = 250;
-	        final int SWIPE_THRESHOLD_VELOCITY = 200;
-	        try {
-	            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-	                return false;
-	            if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	           	 	showNextFriends();
-	                //Log.i(TAG, "Right to Left");
-	            }
-	            else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-	                //Log.i(TAG, "Left to Right");
-	            }
-	        }
-	        catch (Exception e) {
-	            // nothing
-	        }
-	        return super.onFling(e1, e2, velocityX, velocityY);
-	    }
-
-	}
-
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -425,5 +385,42 @@ public class SelectionFragment extends Fragment implements Constants, OnClickLis
 		return (launchCounter == 1 || launchCounter % deltaLaunch ==  0) && firstFragmentApparition;
 	}
 	
+	private class SimpleGestureFilter extends SimpleOnGestureListener {
+		public SimpleGestureFilter() {
+			super();
+		}
+		
+		@Override
+	    public boolean onDown(MotionEvent e) {
+	        return true;
+	    }
+
+	    @Override
+	    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+	        float velocityY) {
+	        //Log.i(TAG, "onFling has been called!");
+	        final int SWIPE_MIN_DISTANCE = 120;
+	        final int SWIPE_MAX_OFF_PATH = 250;
+	        final int SWIPE_THRESHOLD_VELOCITY = 200;
+	        try {
+	            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+	                return false;
+	            if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	           	 	showNextFriends();
+	                //Log.i(TAG, "Right to Left");
+	            }
+	            else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+	                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+	                //Log.i(TAG, "Left to Right");
+	            }
+	        }
+	        catch (Exception e) {
+	            // nothing
+	        }
+	        return super.onFling(e1, e2, velocityX, velocityY);
+	    }
+
+	}
 	
 }
