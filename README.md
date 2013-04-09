@@ -1,4 +1,4 @@
-sack
+FriendRate
 ====
 
 Scopely Android Challenge
